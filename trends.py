@@ -291,6 +291,16 @@ def find_state_center(polygons):
     -156.21763
     """
     "*** YOUR CODE HERE ***"
+    Cx=0
+    Cy=0
+    A_sum = 0
+    for p in polygons:
+        Cx_curr, Cy_curr, A_curr = find_centroid(p)
+        Cx += Cx_curr*A_curr
+        Cy += Cy_curr*A_curr
+        A_sum += A_curr
+    return make_position(Cx/A_sum, Cy/A_sum)
+
 
 
 ###################################
