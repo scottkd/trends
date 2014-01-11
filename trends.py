@@ -7,6 +7,8 @@ from maps import draw_state, draw_name, draw_dot, wait
 from string import ascii_letters
 from ucb import main, trace, interact, log_current_line
 
+import sys
+
 
 ###################################
 # Phase 1: The Feelings in Tweets #
@@ -143,7 +145,6 @@ def make_sentiment(value):
     0
     """
     assert value is None or (value >= -1 and value <= 1), 'Illegal value'
-    #word_sentiments.update({''})
     def val():
         if value is None:
             return None
@@ -152,7 +153,6 @@ def make_sentiment(value):
 
 def has_sentiment(s):
     """Return whether sentiment s has a value."""
-    #return word_sentiments.get(s) is not None
     return s() is not None
 
 def sentiment_value(s):
@@ -301,8 +301,6 @@ def find_state_center(polygons):
         A_sum += A_curr
     return make_position(Cx/A_sum, Cy/A_sum)
 
-
-
 ###################################
 # Phase 3: The Mood of the Nation #
 ###################################
@@ -328,6 +326,26 @@ def group_tweets_by_state(tweets):
     """
     tweets_by_state = {}
     "*** YOUR CODE HERE ***"
+    state_centers = {}
+    for state in us_states.items():
+        center = find_state_center(state[1])
+        state_centers.update({state[0]:center})
+
+    for tweet in tweets:
+        dist=sys.maxsize
+        nearest_state = ''
+        for items in state_centers.items():
+            loc = tweet_location(tweet)
+            curr_dist = geo_distance(loc, items[1])
+            if curr_dist < dist:
+                nearest_state = items[0]
+                dist = curr_dist
+        tweet_list = tweets_by_state.get(nearest_state)
+        if tweet_list == None:
+            tweet_list = []
+        tweet_list.append(tweet)
+        tweets_by_state.update({nearest_state:tweet_list})
+
     return tweets_by_state
 
 def average_sentiments(tweets_by_state):
@@ -344,6 +362,22 @@ def average_sentiments(tweets_by_state):
     """
     averaged_state_sentiments = {}
     "*** YOUR CODE HERE ***"
+    for item in tweets_by_state.items():
+        curr_state = item[0]
+        sent_val = 0
+        count = 0
+        for tweet in item[1]:
+            sent = analyze_tweet_sentiment(tweet)
+            if not has_sentiment(sent):
+                continue
+            curr_sent = sentiment_value(sent)
+            if curr_sent is not None:
+                count += 1
+                sent_val += curr_sent
+        if count > 0:
+            avg_sent = sent_val/count
+            averaged_state_sentiments.update({curr_state:avg_sent})
+
     return averaged_state_sentiments
 
 
