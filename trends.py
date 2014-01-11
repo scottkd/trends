@@ -236,6 +236,38 @@ def find_centroid(polygon):
     (1.0, 2.0, 0.0)
     """
     "*** YOUR CODE HERE ***"
+    A = signed_area(polygon)
+    if A==0:
+        return (latitude(polygon[0]), longitude(polygon[0]), 0)
+    Cx=0
+    Cy=0
+    for i in range(0, len(polygon)-1):
+        xi=latitude(polygon[i])
+        xip1=latitude(polygon[i+1])
+        yi=longitude(polygon[i])
+        yip1=longitude(polygon[i+1])
+        Cx += ((xi+xip1)*(xi*yip1 - xip1*yi))
+
+    for i in range(0, len(polygon)-1):
+        xi=latitude(polygon[i])
+        xip1=latitude(polygon[i+1])
+        yi=longitude(polygon[i])
+        yip1=longitude(polygon[i+1])
+        Cy += ((yi+yip1)*(xi*yip1 - xip1*yi))
+
+    return ((Cx/(6*A)), (Cy/(6*A)), abs(A))
+
+def signed_area(polygon):
+    """Helper function for find_centroid
+
+    polygon -- A list of positions, in which the first and last are the same
+
+    Returns: polygon area
+    """
+    total = 0.0
+    for i in range(0, len(polygon)-1):
+        total += (latitude(polygon[i])*longitude(polygon[i+1]) - latitude(polygon[i+1])*longitude(polygon[i]))
+    return 0.5*total
 
 def find_state_center(polygons):
     """Compute the geographic center of a state, averaged over its polygons.
